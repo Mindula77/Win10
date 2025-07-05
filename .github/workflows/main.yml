@@ -37,7 +37,7 @@ jobs:
         php artisan key:generate --force
         sed -i "s/DB_PASSWORD=.*/DB_PASSWORD=panelpassword/" .env
         
-        php artisan p:environment:setup --author="Poopi" --url=https://panel.poopi.gay --timezone="Asia/Colombo" --cache=true
+        php artisan p:environment:setup --author="Poopi" --url=https://wasdfk.primelandmc.net --timezone="Asia/Colombo" --cache=true
         php artisan p:environment:database --host=127.0.0.1 --port=3306 --database=panel --username=pterodactyl --password=panelpassword
         php artisan p:environment:mail --driver=log
         php artisan migrate --seed --force
