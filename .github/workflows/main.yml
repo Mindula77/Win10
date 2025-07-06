@@ -1,63 +1,20 @@
-# .github/workflows/panel.yml
-
-name: Poopi Panel
-
+name: Windows – Litemanager
 on:
-  schedule:
-    - cron: '*/30 * * * *'  # Reboot every 30 mins
   workflow_dispatch:
 
 jobs:
-  panel:
-    runs-on: ubuntu-latest
-    timeout-minutes: 357
+  build:
+    name: Start Building…
+    runs-on: windows-latest
+
     steps:
-    - name: Set up panel like a king
+    - name: Downloading & installing Essentials
       run: |
-        # Install dependencies
-        sudo apt update && sudo apt install -y curl unzip mariadb-server redis-server php php-mysql php-cli php-curl php-mbstring php-xml php-bcmath php-zip php-gd nginx
-        
-        # Set up MySQL
-        sudo systemctl start mariadb
-        sudo mysql -e "CREATE DATABASE panel;"
-        sudo mysql -e "CREATE USER 'pterodactyl'@'localhost' IDENTIFIED BY 'panelpassword';"
-        sudo mysql -e "GRANT ALL PRIVILEGES ON panel.* TO 'pterodactyl'@'localhost';"
-        sudo mysql -e "FLUSH PRIVILEGES;"
-        
-        # Download panel
-        mkdir -p /var/www/pterodactyl
-        curl -Lo panel.tar.gz https://github.com/pterodactyl/panel/releases/latest/download/panel.tar.gz
-        tar -xzvf panel.tar.gz -C /var/www/pterodactyl
-        cd /var/www/pterodactyl
-        
-        curl -sSL https://getcomposer.org/installer | php
-        php composer.phar install --no-dev --optimize-autoloader
-        
-        cp .env.example .env
-        php artisan key:generate --force
-        sed -i "s/DB_PASSWORD=.*/DB_PASSWORD=panelpassword/" .env
-        
-        php artisan p:environment:setup --author="Poopi" --url=https://wasdfk.primelandmc.net --timezone="Asia/Colombo" --cache=true
-        php artisan p:environment:database --host=127.0.0.1 --port=3306 --database=panel --username=pterodactyl --password=panelpassword
-        php artisan p:environment:mail --driver=log
-        php artisan migrate --seed --force
-        php artisan p:user:make --email=admin@poopi.gay --username=admin --name="Poopi Admin" --password=poopi123 --admin=1
+        Invoke-WebRequest -Uri "https://gitlab.com/chamod12/lm_win-10_github_rdp/-/raw/main/Downloads.bat" -OutFile "Downloads.bat"
+        cmd /c Downloads.bat
 
-        # Cloudflare Tunnel
-        curl -fsSL https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb -o cloudflared.deb
-        sudo dpkg -i cloudflared.deb
-        mkdir -p ~/.cloudflared
+    - name: Connect to LiteManager
+      run: cmd /c show.bat
 
-        echo 'tunnel: POOPI_TUNNEL_ID
-credentials-file: /home/runner/.cloudflared/POOPI_TUNNEL.json
-
-ingress:
-  - hostname: panel.poopi.gay
-    service: http://localhost:80
-  - service: http_status:404' > ~/.cloudflared/config.yml
-
-        echo '${{ secrets.CLOUDFLARE_TUNNEL_CREDENTIALS }}' > ~/.cloudflared/POOPI_TUNNEL.json
-        cloudflared tunnel run POOPI_TUNNEL_ID &
-
-        # Keep alive
-        while true; do sleep 60; done
+    - name: Time Counter
+      run: cmd /c loop.bat
